@@ -1,0 +1,9 @@
+services:
+  web:
+    build: ./src
+    ports:
+      - 8080:8080
+  flagd:
+    image: ghcr.io/open-feature/flagd:latest
+    container_name: flagd
+    command: start --uri file:https://github.com/Inx51/flagd-lab/flags.json
