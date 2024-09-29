@@ -1,5 +1,6 @@
 using Flagd.Options;
 using Microsoft.Extensions.Options;
+using OpenFeature;
 using OpenFeature.Contrib.Providers.Flagd;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,20 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<FlagdOptions>(builder.Configuration.GetSection(FlagdOptions.SectionName));
-builder.Services.AddSingleton
+
+var options = new FlagdOptions();
+builder.Configuration.GetSection(FlagdOptions.SectionName).Bind(options);
+await Api.Instance.SetProviderAsync
 (
-    async sp =>
-    {
-        var options = sp.GetRequiredService<IOptions<FlagdOptions>>().Value;
-        await OpenFeature.Api.Instance.SetProviderAsync
-        (
-            new FlagdProvider
-            (
-                new Uri(options.Endpoint!)
-            )
-        );
-        return OpenFeature.Api.Instance.GetClient();
-    });
+    new FlagdProvider
+    (
+        new Uri(options.Endpoint!)
+    )
+);
+builder.Services.AddSingleton(Api.Instance.GetClient());
 
 var app = builder.Build();
 

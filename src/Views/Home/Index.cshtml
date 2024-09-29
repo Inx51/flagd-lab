@@ -1,5 +1,13 @@
-﻿@{
+﻿@using OpenFeature
+@inject FeatureClient FeatureClient;
+
+@{
     ViewData["Title"] = "Home Page";
+}
+
+@if (await FeatureClient.GetBooleanValueAsync("show-hello-world", false))
+{
+    <h1>Hello, world!</h1>
 }
 
 <div class="text-center">
